@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "220252365310",
+    "project_id": "smart-incident",
+    "storage_bucket": "smart-incident.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:220252365310:android:450d083d7d1efb1b9260af",
+        "android_client_info": {
+          "package_name": "com.saauzi.smartincident.smart_incident"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCqvDUY7TBE0lZlLz2T--AW1U0wzf3cLGM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

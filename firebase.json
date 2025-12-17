@@ -1,0 +1,1 @@
+{"flutter":{"platforms":{"android":{"default":{"projectId":"smart-incident","appId":"1:220252365310:android:450d083d7d1efb1b9260af","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"smart-incident","configurations":{"android":"1:220252365310:android:450d083d7d1efb1b9260af","ios":"1:220252365310:ios:f718b0f3dacd79da9260af"}}}}}}
