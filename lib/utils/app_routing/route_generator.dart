@@ -1,12 +1,13 @@
 export "package:flutter/material.dart";
 import "package:beamer/beamer.dart";
 import "package:flutter/cupertino.dart";
+import "package:smart_incident/feature/incident_form/model/incident_model.dart";
 import "routing_imports.dart";
 
 class RouteGenerator {
   static BeamerDelegate generateRoute() {
     return BeamerDelegate(
-      initialPath: AppRoutes.loginViewRoute,
+      initialPath: AppRoutes.splashViewRoute,
       locationBuilder: RoutesLocationBuilder(
         routes: {
           AppRoutes.splashViewRoute: (context, state, data) => BeamPage(
@@ -38,6 +39,20 @@ class RouteGenerator {
             title: AppRoutes.incidentFormRoute,
             key: ValueKey(AppRoutes.incidentFormRoute),
             child: IncidentForm(),
+            type: BeamPageType.scaleTransition,
+          ),
+
+          AppRoutes.editIncidentScreenRoute: (context, state, data) => BeamPage(
+            title: AppRoutes.editIncidentScreenRoute,
+            key: ValueKey(AppRoutes.editIncidentScreenRoute),
+            child: EditIncidentScreen(incident: data as IncidentModel),
+            type: BeamPageType.scaleTransition,
+          ),
+
+          AppRoutes.profileViewRoute: (context, state, data) => BeamPage(
+            title: AppRoutes.profileViewRoute,
+            key: ValueKey(AppRoutes.profileViewRoute),
+            child: ProfileView(),
             type: BeamPageType.scaleTransition,
           ),
 

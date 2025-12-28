@@ -11,6 +11,7 @@ import 'package:smart_incident/feature/common/widgets/generic_elevated_button.da
 import 'package:smart_incident/feature/login/controller/login_controller.dart';
 import 'package:smart_incident/utils/app_routing/app_routes.dart';
 import 'package:smart_incident/utils/custom_validator.dart';
+import 'package:smart_incident/utils/local_storage/local_storage_service.dart';
 
 class LoginView extends ConsumerStatefulWidget {
   static const String loginViewRoute = "/loginViewRoute";
@@ -101,14 +102,25 @@ class _LoginViewState extends ConsumerState<LoginView> {
             text: "Login",
             isLoading: ref.watch(loginController).isLoading,
             onPressed: () async {
-              final bool success = await ref
+              final success = await ref
                   .read(loginController)
                   .userLogin(
                     email: emailController.text,
                     password: passwordController.text,
                   );
               if (success) {
-                CustomToast(
+                if (ref.read(loginController).isRememberMeChecked) {
+                  await LocalStorageService.saveCredentials(
+                    email: emailController.text,
+                    password: passwordController.text,
+                    rememberMe: true,
+                  );
+                } else {
+                  await LocalStorageService.clearCredentials();
+                }
+
+                CustomToast.show(
+                  context,
                   message: "Logged in successfully",
                   toastEnum: ToastEnum.success,
                 );
@@ -116,7 +128,8 @@ class _LoginViewState extends ConsumerState<LoginView> {
                   context,
                 ).beamToReplacementNamed(AppRoutes.homeViewRoute);
               } else {
-                CustomToast(
+                CustomToast.show(
+                  context,
                   message: "Failed to login. Please try again later",
                   toastEnum: ToastEnum.error,
                 );

@@ -25,19 +25,20 @@ class IncidentFormController extends StateNotifier<GenericState<bool>> {
       state = LoadingState<bool>();
       FirebaseFirestore db = FirebaseFirestore.instance;
       await Future.delayed(Duration.zero);
+      final createdDate = DateTime.now().toIso8601String();
       final incidentFormModel = IncidentModel(
         title: title,
         incidentTypes: incidentType,
         description: description,
         priority: priority,
-        createdDate: DateTime.now().toIso8601String(),
+        createdDate: createdDate,
         imageUrl: "aaasdfasdf",
       );
       final docRef = db
           .collection(FirebaseCollection.incidentCollection)
           .doc(AppConfig.instance.userId ?? "")
           .collection(FirebaseCollection.userIncidentCollection)
-          .doc(DateTime.now().toIso8601String());
+          .doc(createdDate);
       await docRef.set(incidentFormModel.toJson());
       state = SuccessState(data: true);
     } catch (e, s) {

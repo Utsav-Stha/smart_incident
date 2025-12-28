@@ -4,35 +4,34 @@ import "package:smart_incident/feature/common/constants/app_colors.dart";
 import "package:smart_incident/feature/common/constants/style_constants.dart";
 
 class CustomToast {
-  CustomToast({required String message, required ToastEnum toastEnum}) {
-    customShowToast(message: message, toastEnum: toastEnum);
-  }
-
-  void customShowToast({
-    required String? message,
+  static void show(
+    BuildContext context, {
+    required String message,
     required ToastEnum toastEnum,
   }) {
-  final a =   SnackBar(
-      behavior: SnackBarBehavior.floating,
-      margin: EdgeInsets.fromLTRB(10.r, 0.r, 10.r, 40.r),
-      showCloseIcon: true,
-      elevation: 0,
-      shape: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10.r),
-        borderSide: BorderSide(
-          color: toastEnum.getToastBackgroundColor().withAlpha(100),
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.fromLTRB(10.r, 0.r, 10.r, 40.r),
+        showCloseIcon: true,
+        elevation: 0,
+        shape: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.r),
+          borderSide: BorderSide(
+            color: toastEnum.getToastBackgroundColor().withAlpha(100),
+          ),
         ),
+        backgroundColor: toastEnum.getToastBackgroundColor(),
+        closeIconColor: AppColors.white,
+        content: Text(message, style: StyleConstant.white600Regular16),
+        duration: const Duration(milliseconds: 1200),
+        animation: CurvedAnimation(
+          parent: const AlwaysStoppedAnimation(1.0),
+          curve: Curves.easeOutBack,
+          reverseCurve: Curves.easeInBack,
+        ),
+        dismissDirection: DismissDirection.down,
       ),
-      backgroundColor: toastEnum.getToastBackgroundColor(),
-      closeIconColor: AppColors.white,
-      content: Text(message ?? "", style: StyleConstant.white600Regular16),
-      duration: Duration(milliseconds: 1200),
-      animation: CurvedAnimation(
-        parent: const AlwaysStoppedAnimation(1.0),
-        curve: Curves.easeOutBack,
-        reverseCurve: Curves.easeInBack,
-      ),
-      dismissDirection: DismissDirection.down,
     );
   }
 }

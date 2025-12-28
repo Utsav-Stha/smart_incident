@@ -1,5 +1,3 @@
-
-
 import "routing_imports.dart";
 
 class AppRoutes {
@@ -14,4 +12,9 @@ class AppRoutes {
   static const String homeViewRoute = HomeView.homeViewRoute;
 
   static const String incidentFormRoute = IncidentForm.incidentFormRoute;
+
+  static const String editIncidentScreenRoute =
+      EditIncidentScreen.editIncidentScreenRoute;
+
+  static const String profileViewRoute = ProfileView.profileViewRoute;
 }

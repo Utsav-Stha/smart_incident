@@ -1,11 +1,8 @@
 import 'package:beamer/beamer.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:smart_incident/utils/app_config.dart';
 import 'package:smart_incident/utils/app_routing/app_routing.dart';
-import 'feature/common/constants/firebase_collection.dart';
 import 'firebase_options.dart';
 
 void main() async {

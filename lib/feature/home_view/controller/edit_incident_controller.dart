@@ -22,6 +22,7 @@ class EditIncidentController extends StateNotifier<GenericState> {
     required String createdDate,
     String? imageUrl,
   }) async {
+    state = LoadingState();
     FirebaseFirestore db = FirebaseFirestore.instance;
     await Future.delayed(Duration.zero);
     try {
@@ -33,14 +34,25 @@ class EditIncidentController extends StateNotifier<GenericState> {
         createdDate: createdDate,
         imageUrl: imageUrl ?? "",
       );
-      final docRef = db
+      final collectionRef = db
           .collection(FirebaseCollection.incidentCollection)
           .doc(AppConfig.instance.userId ?? "")
-          .collection(FirebaseCollection.userIncidentCollection)
-          .doc(DateTime.now().toIso8601String());
-      docRef.update(incidentFormModel.toJson());
-    } catch (e) {
-      print("Erorrr:$e");
+          .collection(FirebaseCollection.userIncidentCollection);
+
+      final querySnapshot = await collectionRef
+          .where('createdDate', isEqualTo: createdDate)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        await querySnapshot.docs.first.reference.update(
+          incidentFormModel.toJson(),
+        );
+      } else {
+        await collectionRef.doc(createdDate).update(incidentFormModel.toJson());
+      }
+      state = SuccessState(data: true);
+    } catch (e, s) {
+      state = ErrorState(error: e.toString(), stackTrace: s);
     }
   }
 }

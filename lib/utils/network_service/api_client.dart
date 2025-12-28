@@ -38,10 +38,14 @@ final class ApiClient {
           bool isConnected =
               await InternetConnectionChecker.instance.hasConnection;
           if (!isConnected) {
-            CustomToast(
-              message: "Please Check Your Internet Connection",
-              toastEnum: ToastEnum.information,
-            );
+            final context = MyApp.navigatorKey.currentContext;
+            if (context != null) {
+              CustomToast.show(
+                context,
+                message: "Please Check Your Internet Connection",
+                toastEnum: ToastEnum.information,
+              );
+            }
 
             return handler.reject(
               DioException(
@@ -75,7 +79,8 @@ final class ApiClient {
                 AppRoutes.loginViewRoute,
                 (route) => false,
               );
-              CustomToast(
+              CustomToast.show(
+                innerContext,
                 message: "Session Expired",
                 toastEnum: ToastEnum.information,
               );

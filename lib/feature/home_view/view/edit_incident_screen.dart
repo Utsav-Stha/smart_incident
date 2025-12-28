@@ -9,44 +9,62 @@ import 'package:smart_incident/feature/common/enum/priority_status.dart';
 import 'package:smart_incident/feature/common/widgets/custom_multi_line_text_form_field.dart';
 import 'package:smart_incident/feature/common/widgets/custom_text_field.dart';
 import 'package:smart_incident/feature/common/widgets/generic_elevated_button.dart';
-import 'package:smart_incident/feature/incident_form/controller/incident_form_controller.dart';
+import 'package:smart_incident/feature/home_view/controller/delete_incident_controller.dart';
+import 'package:smart_incident/feature/home_view/controller/edit_incident_controller.dart';
+import 'package:smart_incident/feature/home_view/controller/home_controller.dart';
 import 'package:smart_incident/feature/incident_form/controller/incident_type_controller.dart';
+import 'package:smart_incident/feature/incident_form/model/incident_model.dart';
 import 'package:smart_incident/feature/incident_form/model/incident_type_model.dart';
 import 'package:smart_incident/feature/incident_form/view/widgets/priority_status_tab.dart';
 import 'package:smart_incident/utils/state_management/generic_state.dart';
 import 'package:smart_incident/utils/state_management/generic_state_handler.dart';
 
-class IncidentForm extends ConsumerStatefulWidget {
-  static const String incidentFormRoute = "/incidentFormRoute";
+class EditIncidentScreen extends ConsumerStatefulWidget {
+  static const String editIncidentScreenRoute = "/editIncidentScreenRoute";
+  final IncidentModel incident;
 
-  const IncidentForm({super.key});
+  const EditIncidentScreen({super.key, required this.incident});
 
   @override
-  ConsumerState<IncidentForm> createState() => _State();
+  ConsumerState<EditIncidentScreen> createState() => _EditIncidentScreenState();
 }
 
-class _State extends ConsumerState<IncidentForm> {
+class _EditIncidentScreenState extends ConsumerState<EditIncidentScreen> {
   IncidentTypeModel? incidentTypeModel;
 
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  ValueNotifier<PriorityStatus> statusNotifier = ValueNotifier(
-    PriorityStatus.low,
-  );
+  late final TextEditingController _titleController;
+  late final TextEditingController _descriptionController;
+  late ValueNotifier<PriorityStatus> statusNotifier;
 
   @override
   void initState() {
     super.initState();
+    _titleController = TextEditingController(text: widget.incident.title);
+    _descriptionController = TextEditingController(
+      text: widget.incident.description,
+    );
+    statusNotifier = ValueNotifier(widget.incident.priority);
     ref.read(incidentTypeController.notifier).fetchIncidentTypes();
   }
 
   @override
   Widget build(BuildContext context) {
-    ref.listen(incidentFormController, (previous, next) {
+    ref.listen(editIncidentController, (previous, next) {
       if (next case SuccessState()) {
+        ref.read(homeController.notifier).fetchIncidentList();
         Beamer.of(context).beamBack();
       }
     });
+
+    ref.listen(deleteIncidentController, (previous, next) {
+      if (next case SuccessState()) {
+        ref.read(homeController.notifier).fetchIncidentList();
+        while (Beamer.of(context).canBeamBack) {
+          Beamer.of(context).beamBack();
+        }
+      }
+    });
+
     final incidentTypeProvider = ref.watch(incidentTypeController);
 
     return Scaffold(
@@ -63,10 +81,42 @@ class _State extends ConsumerState<IncidentForm> {
           ),
         ),
         centerTitle: true,
-        title: Text("Incident Form", style: StyleConstant.black500Regular18),
+        title: Text("Edit Incident", style: StyleConstant.black500Regular18),
+        actions: [
+          IconButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text("Delete Incident"),
+                  content: Text(
+                    "Are you sure you want to delete this incident?",
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text("No"),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        ref
+                            .read(deleteIncidentController.notifier)
+                            .deleteIncident(
+                              createdDate: widget.incident.createdDate,
+                            );
+                      },
+                      child: Text("Yes"),
+                    ),
+                  ],
+                ),
+              );
+            },
+            icon: Icon(Icons.delete, color: AppColors.red),
+          ),
+        ],
       ),
       body: Form(
-        // key: ,
         child: ListView(
           padding: EdgeInsets.symmetric(horizontal: 10.r, vertical: 20.r),
           children: [
@@ -110,11 +160,17 @@ class _State extends ConsumerState<IncidentForm> {
                 ),
               ),
               onLoaded: (dataList) {
-                incidentTypeModel = dataList.first;
-                return DropdownSearch<IncidentTypeModel>(
-                  selectedItem: dataList.isNotEmpty ? dataList.first : null,
-                  items: (filter, infiniteScrollProps) => dataList,
+                try {
+                  incidentTypeModel = dataList.firstWhere(
+                    (element) => element.name == widget.incident.incidentTypes,
+                  );
+                } catch (e) {
+                  incidentTypeModel = dataList.firstOrNull;
+                }
 
+                return DropdownSearch<IncidentTypeModel>(
+                  selectedItem: incidentTypeModel,
+                  items: (filter, infiniteScrollProps) => dataList,
                   compareFn: (item1, item2) {
                     return item1.id == item2.id;
                   },
@@ -211,16 +267,17 @@ class _State extends ConsumerState<IncidentForm> {
         child: Padding(
           padding: EdgeInsets.fromLTRB(10.r, 0, 10.r, 20.r),
           child: GenericElevatedButton(
-            text: "Save",
-            isLoading: ref.watch(incidentFormController) is LoadingState,
+            text: "Update",
+            isLoading: ref.watch(editIncidentController) is LoadingState,
             onPressed: () {
               ref
-                  .read(incidentFormController.notifier)
-                  .createNewIncident(
+                  .read(editIncidentController.notifier)
+                  .editIncident(
                     title: _titleController.text,
                     incidentType: incidentTypeModel?.name ?? '',
                     description: _descriptionController.text,
                     priority: statusNotifier.value,
+                    createdDate: widget.incident.createdDate,
                   );
             },
           ),

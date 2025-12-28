@@ -20,9 +20,15 @@ class SignUpView extends ConsumerStatefulWidget {
 }
 
 class _SignUpViewState extends ConsumerState<SignUpView> {
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
-  TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+  final GlobalKey<FormState> _formKeyStep1 = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKeyStep2 = GlobalKey<FormState>();
+
+  int _currentStep = 0;
   bool _hasMinLength = false;
   bool _hasUppercase = false;
   bool _hasLowercase = false;
@@ -58,9 +64,24 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
   @override
   void dispose() {
     super.dispose();
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+  }
+
+  void _nextStep() {
+    if (_formKeyStep1.currentState!.validate()) {
+      setState(() {
+        _currentStep = 1;
+      });
+    }
+  }
+
+  void _previousStep() {
+    setState(() {
+      _currentStep = 0;
+    });
   }
 
   @override
@@ -71,7 +92,6 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
         padding: EdgeInsets.symmetric(horizontal: 10.r, vertical: 40.r),
         children: [
           20.verticalSpace,
-
           CircleAvatar(
             radius: 50.r,
             backgroundColor: AppColors.white,
@@ -80,56 +100,11 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
           20.verticalSpace,
           Text(
             "Sign In To Manage Your Incident Reports Efficiently",
-
             textAlign: TextAlign.center,
             style: StyleConstant.grey500Regular18,
           ),
           40.verticalSpace,
-          CustomTextField(
-            title: "Email",
-            hintText: "Enter your email",
-            controller: _emailController,
-            validator: (value) => CustomValidator.validateEmail(value),
-          ),
-          20.verticalSpace,
-          CustomTextField(
-            title: "Password",
-            hintText: "Enter your password",
-            controller: _passwordController,
-            isPassword: true,
-          ),
-          20.verticalSpace,
-          _buildValidationItem('At least 8 characters', _hasMinLength),
-          _buildValidationItem('Contains uppercase letter', _hasUppercase),
-          _buildValidationItem('Contains lowercase letter', _hasLowercase),
-          _buildValidationItem('Contains number', _hasDigit),
-          _buildValidationItem('Contains special character', _hasSpecialChar),
-          20.verticalSpace,
-          CustomTextField(
-            title: "Confirm Password",
-            enabled: _passwordController.text.isNotEmpty,
-            hintText: "Enter your confirm password",
-            controller: _confirmPasswordController,
-            isPassword: true,
-          ),
-
-          20.verticalSpace,
-          GenericElevatedButton(
-            text: "Sign Up",
-
-            onPressed: () async {
-              final bool success = await ref
-                  .read(signUpController.notifier)
-                  .userSignUp(
-                    email: _emailController.text,
-                    password: _passwordController.text,
-                  );
-              if(success && context.mounted) {
-                Beamer.of(context).beamBack();
-              }
-            },
-            isLoading: ref.watch(signUpController).isUploading,
-          ),
+          if (_currentStep == 0) _buildStep1() else _buildStep2(),
           20.verticalSpace,
           Center(
             child: RichText(
@@ -147,6 +122,105 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
                 ],
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStep1() {
+    return Form(
+      key: _formKeyStep1,
+      child: Column(
+        children: [
+          CustomTextField(
+            title: "Full Name",
+            hintText: "Enter your full name",
+            controller: _nameController,
+            validator: (value) => CustomValidator.validateName(value),
+          ),
+          20.verticalSpace,
+          CustomTextField(
+            title: "Email",
+            hintText: "Enter your email",
+            controller: _emailController,
+            validator: (value) => CustomValidator.validateEmail(value),
+          ),
+          20.verticalSpace,
+          GenericElevatedButton(text: "Next", onPressed: _nextStep),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStep2() {
+    return Form(
+      key: _formKeyStep2,
+      child: Column(
+        children: [
+          CustomTextField(
+            title: "Password",
+            hintText: "Enter your password",
+            controller: _passwordController,
+            isPassword: true,
+            validator: (value) {
+              if (!_isPasswordValid)
+                return 'Password does not meet requirements';
+              return null;
+            },
+          ),
+          20.verticalSpace,
+          _buildValidationItem('At least 8 characters', _hasMinLength),
+          _buildValidationItem('Contains uppercase letter', _hasUppercase),
+          _buildValidationItem('Contains lowercase letter', _hasLowercase),
+          _buildValidationItem('Contains number', _hasDigit),
+          _buildValidationItem('Contains special character', _hasSpecialChar),
+          20.verticalSpace,
+          CustomTextField(
+            title: "Confirm Password",
+            enabled: _passwordController.text.isNotEmpty,
+            hintText: "Enter your confirm password",
+            controller: _confirmPasswordController,
+            isPassword: true,
+            validator: (value) {
+              if (value != _passwordController.text) {
+                return 'Passwords do not match';
+              }
+              return null;
+            },
+          ),
+          20.verticalSpace,
+          Row(
+            children: [
+              Expanded(
+                child: GenericElevatedButton(
+                  text: "Back",
+                  onPressed: _previousStep,
+                  buttonColor: Colors.grey,
+                ),
+              ),
+              10.horizontalSpace,
+              Expanded(
+                child: GenericElevatedButton(
+                  text: "Sign Up",
+                  onPressed: () async {
+                    if (_formKeyStep2.currentState!.validate()) {
+                      final bool success = await ref
+                          .read(signUpController.notifier)
+                          .userSignUp(
+                            name: _nameController.text,
+                            email: _emailController.text,
+                            password: _passwordController.text,
+                          );
+                      if (success && context.mounted) {
+                        Beamer.of(context).beamBack();
+                      }
+                    }
+                  },
+                  isLoading: ref.watch(signUpController).isUploading,
+                ),
+              ),
+            ],
           ),
         ],
       ),

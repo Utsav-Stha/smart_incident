@@ -25,10 +25,13 @@ class GenericStateHandler<T> extends StatelessWidget {
     }
 
     if (state case SuccessState()) {
+      if (state.data is List && (state.data as List).isEmpty) {
+        return onEmpty(state.data);
+      }
       return onLoaded(state.data);
     }
     if (state case ErrorState()) {
-      return SnackBar(content: Text(state.error.toString()));
+      return Center(child: Text(state.error.toString()));
     }
 
     return const SizedBox.shrink();
