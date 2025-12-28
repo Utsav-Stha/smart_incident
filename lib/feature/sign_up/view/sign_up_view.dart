@@ -104,7 +104,7 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
             style: StyleConstant.grey500Regular18,
           ),
           40.verticalSpace,
-          if (_currentStep == 0)?_buildStep1():  _buildStep2(),
+          (_currentStep == 0) ? _buildStep1() : _buildStep2(),
           20.verticalSpace,
           Center(
             child: RichText(
@@ -230,20 +230,19 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
 
   Widget _buildValidationItem(String text, bool isValid) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: EdgeInsets.symmetric(vertical: 10.r),
       child: Row(
         children: [
           Icon(
             isValid ? Icons.check_circle : Icons.cancel,
             color: isValid ? Colors.green : Colors.grey,
-            size: 20,
+            size: 25.r,
           ),
-          const SizedBox(width: 8),
+          10.horizontalSpace,
           Text(
             text,
-            style: TextStyle(
+            style: StyleConstant.grey500Regular14.copyWith(
               color: isValid ? Colors.green : Colors.grey,
-              fontSize: 14,
             ),
           ),
         ],
