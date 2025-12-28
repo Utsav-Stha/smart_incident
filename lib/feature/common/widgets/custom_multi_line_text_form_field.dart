@@ -89,6 +89,7 @@ class _CustomMultiLineTextFormFieldState
                 minLines: null,
                 maxLines: null,
                 expands: true,
+                textAlignVertical: TextAlignVertical.top,
                 onTapOutside: (event) {
                   FocusManager.instance.primaryFocus?.unfocus();
                 },

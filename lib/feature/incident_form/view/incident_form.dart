@@ -15,6 +15,7 @@ import 'package:smart_incident/feature/incident_form/model/incident_type_model.d
 import 'package:smart_incident/feature/incident_form/view/widgets/priority_status_tab.dart';
 import 'package:smart_incident/utils/state_management/generic_state.dart';
 import 'package:smart_incident/utils/state_management/generic_state_handler.dart';
+import 'package:smart_incident/utils/custom_validator.dart';
 
 class IncidentForm extends ConsumerStatefulWidget {
   static const String incidentFormRoute = "/incidentFormRoute";
@@ -27,6 +28,7 @@ class IncidentForm extends ConsumerStatefulWidget {
 
 class _State extends ConsumerState<IncidentForm> {
   IncidentTypeModel? incidentTypeModel;
+  final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -66,7 +68,7 @@ class _State extends ConsumerState<IncidentForm> {
         title: Text("Incident Form", style: StyleConstant.black500Regular18),
       ),
       body: Form(
-        // key: ,
+        key: _formKey,
         child: ListView(
           padding: EdgeInsets.symmetric(horizontal: 10.r, vertical: 20.r),
           children: [
@@ -74,6 +76,7 @@ class _State extends ConsumerState<IncidentForm> {
               title: "Title",
               hintText: "Enter title",
               controller: _titleController,
+              validator: CustomValidator.validateTitle,
             ),
             10.verticalSpace,
             Row(
@@ -121,9 +124,7 @@ class _State extends ConsumerState<IncidentForm> {
                   itemAsString: (item) {
                     return item.name;
                   },
-                  validator: (value) {
-                    return null;
-                  },
+                  validator: CustomValidator.validateIncidentType,
                   onChanged: (value) {
                     incidentTypeModel = value;
                   },
@@ -192,6 +193,7 @@ class _State extends ConsumerState<IncidentForm> {
               title: "Description",
               hintText: "Enter description of incident",
               controller: _descriptionController,
+              validator: CustomValidator.validateDescription,
             ),
             10.verticalSpace,
             ValueListenableBuilder(
@@ -214,14 +216,16 @@ class _State extends ConsumerState<IncidentForm> {
             text: "Save",
             isLoading: ref.watch(incidentFormController) is LoadingState,
             onPressed: () {
-              ref
-                  .read(incidentFormController.notifier)
-                  .createNewIncident(
-                    title: _titleController.text,
-                    incidentType: incidentTypeModel?.name ?? '',
-                    description: _descriptionController.text,
-                    priority: statusNotifier.value,
-                  );
+              if (_formKey.currentState!.validate()) {
+                ref
+                    .read(incidentFormController.notifier)
+                    .createNewIncident(
+                      title: _titleController.text,
+                      incidentType: incidentTypeModel?.name ?? '',
+                      description: _descriptionController.text,
+                      priority: statusNotifier.value,
+                    );
+              }
             },
           ),
         ),

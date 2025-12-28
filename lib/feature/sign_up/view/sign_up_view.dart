@@ -104,7 +104,7 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
             style: StyleConstant.grey500Regular18,
           ),
           40.verticalSpace,
-          if (_currentStep == 0) _buildStep1() else _buildStep2(),
+          if (_currentStep == 0)?_buildStep1():  _buildStep2(),
           20.verticalSpace,
           Center(
             child: RichText(
@@ -164,8 +164,9 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
             controller: _passwordController,
             isPassword: true,
             validator: (value) {
-              if (!_isPasswordValid)
+              if (!_isPasswordValid) {
                 return 'Password does not meet requirements';
+              }
               return null;
             },
           ),
