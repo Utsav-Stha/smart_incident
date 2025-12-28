@@ -1,20 +1,32 @@
-# smart_incident
-<<<<<<< HEAD
+# Smart Incident App
 
-A cross platform mobile app allows users to create and manage incident  reports.
+## Flutter Version
+- **SDK**: `^3.10.1` (Ensure you have Flutter 3.10.1 or higher installed).
 
-## Getting Started
+## Firebase Setup
+This project uses Firebase for backend services. To set it up:
 
-This project is a starting point for a Flutter application.
+1. **Install Firebase CLI**:
+   ```bash
+   npm install -g firebase-tools
+   ```
+2. **Login to Firebase**:
+   ```bash
+   firebase login
+   ```
+3. **Activate FlutterFire CLI**:
+   ```bash
+   dart pub global activate flutterfire_cli
+   ```
+4. **Configure Firebase**:
+   Run the following command in the project root to connect your Flutter app to your Firebase project:
+   ```bash
+   flutterfire configure
+   ```
+   Follow the prompts to select your project and platforms (Android, iOS, etc.).
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-=======
-Cross Platform mobile app where user can add and manager incident reports
->>>>>>> ab59250003613f2cfe405f69a1857ffb4dc8e58f
+## Incident Type API Source
+The incident types are fetched from the following MockAPI endpoint:
+- **Base URL**: `https://694a90bb26e870772065e847.mockapi.io/smartIncident/api/v1`
+- **Endpoint**: `/incidentTypes`
+- **Full URL**: `https://694a90bb26e870772065e847.mockapi.io/smartIncident/api/v1/incidentTypes`
